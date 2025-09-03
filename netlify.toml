@@ -1,0 +1,9 @@
+# This file gives Netlify direct instructions for building the site.
+# Settings in this file are more powerful than the UI settings.
+
+[build]
+  # This tells Netlify exactly where to find your function files.
+  functions = "netlify/functions"
+
+# By NOT specifying a "base" directory in this file,
+# we are forcing it to use the correct default (the root of the project).
