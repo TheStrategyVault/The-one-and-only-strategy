@@ -1,84 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Access</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #0052cc;
-            --primary-hover: #0041a3;
-            --background-color: #f7f9fc;
-            --card-background: #ffffff;
-            --text-color: #333333;
-            --subtle-text: #555555;
-        }
-        body {
-            font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background-color: var(--background-color);
-            background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070');
-            background-size: cover; background-position: center;
-        }
-        .login-card {
-            background-color: var(--card-background); padding: 50px 40px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; width: 90%;
-            max-width: 400px; border: 1px solid #e1e4e8;
-        }
-        .login-card h1 { color: var(--text-color); font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-        .login-card p { color: var(--subtle-text); font-size: 16px; margin-bottom: 30px; }
-        .cta-button {
-            display: inline-block; background-color: var(--primary-color); color: white; padding: 14px 30px;
-            font-size: 16px; font-weight: 500; text-decoration: none; border: none; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s ease-in-out;
-        }
-        .cta-button:hover { background-color: var(--primary-hover); }
-    </style>
-</head>
-<body>
-    <div class="login-card">
-        <h1>The Ultimate Guide to Success</h1>
-        <p>Enter your unique access key to begin.</p>
-        <button class="cta-button" onclick="checkKey()">Unlock Course</button>
-    </div>
+<script>
+    async function checkKey() {
+        // Get the button and show a "loading" state
+        const button = document.querySelector('.cta-button');
+        button.textContent = 'Checking...';
+        button.disabled = true;
 
-    <script>
-        // --- THIS IS THE CORRECTED SCRIPT ---
+        let userKey = prompt('Please enter your access key:');
 
-        // Define your secret key here
-        const secretKey = 'YOUR_SECRET_KEY_HERE';
-
-        // This function runs when the page loads
-        function onPageLoad() {
-            const claimedKey = localStorage.getItem('courseAccessKey');
-            
-            // If the correct key is already saved, go directly to the course
-            if (claimedKey && claimedKey === secretKey) {
-                window.location.href = 'course.html';
-            }
-            // Otherwise, do nothing and wait for the user to click the button.
+        if (!userKey) {
+            button.textContent = 'Unlock Course';
+            button.disabled = false;
+            return;
         }
 
-        // This function runs when the button is clicked
-        function checkKey() {
-            let userKey = prompt('Please enter your access key:');
+        try {
+            // This special URL points to the function we built.
+            // It works automatically on Netlify.
+            const response = await fetch('/.netlify/functions/check-key?key=' + userKey);
+            const data = await response.json();
 
-            if (userKey === secretKey) {
-                // If the key is correct, save it and go to the course
-                localStorage.setItem('courseAccessKey', userKey);
+            if (data.isValid) {
                 alert('Success! Accessing the course now.');
                 window.location.href = 'course.html';
-            } else if (userKey != null && userKey !== "") {
-                // If the key is wrong (and not empty), show an error
-                alert('Access Denied: The key you entered is incorrect.');
+            } else {
+                alert('Access Denied. This key is invalid or has already been used.');
+                button.textContent = 'Unlock Course';
+                button.disabled = false;
             }
-            // If the user clicks "Cancel" (userKey is null), do nothing.
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+            button.textContent = 'Unlock Course';
+            button.disabled = false;
         }
-
-        // Run the auto-login check when the page first loads
-        onPageLoad();
-    </script>
-</body>
-</html>
+    }
+</script>
