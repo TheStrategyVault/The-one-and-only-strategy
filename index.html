@@ -16,116 +16,69 @@
             --text-color: #333333;
             --subtle-text: #555555;
         }
-
         body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
             background-color: var(--background-color);
-            
-            /* --- OPTIONAL: BACKGROUND IMAGE --- */
-            /* To use an image, uncomment the line below and replace the URL. */
-            /* Find images at unsplash.com or pexels.com */
             background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
         }
-
         .login-card {
-            background-color: var(--card-background);
-            padding: 50px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid #e1e4e8;
+            background-color: var(--card-background); padding: 50px 40px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; width: 90%;
+            max-width: 400px; border: 1px solid #e1e4e8;
         }
-
-        .login-card h1 {
-            color: var(--text-color);
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .login-card p {
-            color: var(--subtle-text);
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
+        .login-card h1 { color: var(--text-color); font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+        .login-card p { color: var(--subtle-text); font-size: 16px; margin-bottom: 30px; }
         .cta-button {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 14px 30px;
-            font-size: 16px;
-            font-weight: 500;
-            text-decoration: none;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
+            display: inline-block; background-color: var(--primary-color); color: white; padding: 14px 30px;
+            font-size: 16px; font-weight: 500; text-decoration: none; border: none; border-radius: 8px;
+            cursor: pointer; transition: background-color 0.2s ease-in-out;
         }
-
-        .cta-button:hover {
-            background-color: var(--primary-hover);
-        }
+        .cta-button:hover { background-color: var(--primary-hover); }
     </style>
 </head>
 <body>
     <div class="login-card">
-        CUSTOMIZE YOUR TITLE AND SUBTITLE HERE <--- -->
         <h1>The Ultimate Guide to Success</h1>
         <p>Enter your unique access key to begin.</p>
         <button class="cta-button" onclick="checkKey()">Unlock Course</button>
     </div>
 
     <script>
-        function checkKey() {
-            // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-            // ---> 1. REPLACE THIS WITH THE KEY YOU WILL GIVE YOUR USERS <---
-            const secretKey = 'test20'; 
-            // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+        // --- THIS IS THE CORRECTED SCRIPT ---
 
-            // Check if this key has already been "claimed" in this browser's storage
+        // Define your secret key here
+        const secretKey = 'YOUR_SECRET_KEY_HERE';
+
+        // This function runs when the page loads
+        function onPageLoad() {
             const claimedKey = localStorage.getItem('courseAccessKey');
-
-            if (claimedKey) {
-                // If a key is already stored, check if it matches
-                if (claimedKey === secretKey) {
-                    alert('Welcome back! Accessing the course.');
-                    window.location.href = 'course.html';
-                } else {
-                    // This happens if they previously used a different, invalid key
-                    alert('Access Denied. Please contact support.');
-                }
-                return; // Stop the function here
-            }
-
-            // If no key is stored, ask for one
-            let userKey = prompt('Please enter your unique access key to activate and lock it to this device:');
-
-            if (userKey === secretKey) {
-                // If the key is correct, "claim" it by saving it to localStorage
-                localStorage.setItem('courseAccessKey', userKey);
-                alert('Success! Your key has been activated on this device. Accessing the course now.');
+            
+            // If the correct key is already saved, go directly to the course
+            if (claimedKey && claimedKey === secretKey) {
                 window.location.href = 'course.html';
-            } else if (userKey != null) {
-                // If the key is wrong, deny access
-                alert('Access Denied: The key you entered is incorrect or invalid.');
             }
+            // Otherwise, do nothing and wait for the user to click the button.
         }
 
-        // --- NEW ---
-        // This part runs as soon as the page loads to automatically
-        // redirect returning users who have already claimed a key.
-        (function() {
-            // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-            // ---> 2. IMPORTANT: THIS KEY MUST MATCH THE ONE ABOVE <---
-            const secretKey = 'test20'; 
-            // ^ ^ ^ ^
+        // This function runs when the button is clicked
+        function checkKey() {
+            let userKey = prompt('Please enter your access key:');
+
+            if (userKey === secretKey) {
+                // If the key is correct, save it and go to the course
+                localStorage.setItem('courseAccessKey', userKey);
+                alert('Success! Accessing the course now.');
+                window.location.href = 'course.html';
+            } else if (userKey != null && userKey !== "") {
+                // If the key is wrong (and not empty), show an error
+                alert('Access Denied: The key you entered is incorrect.');
+            }
+            // If the user clicks "Cancel" (userKey is null), do nothing.
+        }
+
+        // Run the auto-login check when the page first loads
+        onPageLoad();
+    </script>
+</body>
+</html>
