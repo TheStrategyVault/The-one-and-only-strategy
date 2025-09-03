@@ -40,9 +40,9 @@
 </head>
 <body>
     <div class="login-card">
-        <h1>The Ultimate Guide to Success</h1>
+        <h1>The Forbidden Algorithm: The Secret Casinos Don't Want You to Know</h1>
         <p>Enter your unique access key to begin.</p>
-        <button class="cta-button" onclick="checkKey()">Unlock Course</button>
+        <button class="cta-button" onclick="checkKey()">Unlock Your Path to Profitability</button>
     </div>
 
     <script>
@@ -55,7 +55,7 @@
             let userKey = prompt('Please enter your access key:');
 
             if (!userKey) {
-                button.textContent = 'Unlock Course';
+                button.textContent = 'Unlock Your Path to Profitability';
                 button.disabled = false;
                 return;
             }
@@ -67,16 +67,16 @@
                 const data = await response.json();
 
                 if (data.isValid) {
-                    alert('Success! Accessing the course now.');
+                    alert('Success! Accessing the playbook now.');
                     window.location.href = 'course.html';
                 } else {
                     alert('Access Denied. This key is invalid or has already been used.');
-                    button.textContent = 'Unlock Course';
+                    button.textContent = 'Unlock Your Path to Profitability';
                     button.disabled = false;
                 }
             } catch (error) {
                 alert('An error occurred. Please try again.');
-                button.textContent = 'Unlock Course';
+                button.textContent = 'Unlock Your Path to Profitability';
                 button.disabled = false;
             }
         }
