@@ -5,7 +5,11 @@ const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 exports.handler = async function (event, context) {
   try {
     const { key } = event.queryStringParameters;
-    const clientIp = event.headers['client-ip'];
+    
+    // --- THIS IS THE ONLY LINE THAT HAS CHANGED ---
+    // We are now using Netlify's specific header for the visitor's IP address.
+    const clientIp = event.headers['x-nf-client-connection-ip'];
+    
     console.log("Function received key:", key);
 
     if (!key) {
@@ -31,7 +35,6 @@ exports.handler = async function (event, context) {
     await base(AIRTABLE_TABLE_NAME).update(record.id, {
       "Status": "Used",
       "UsedByIP": clientIp,
-      // --- THIS IS THE ONLY LINE THAT HAS CHANGED ---
       "DateUsed": new Date().toISOString()
     });
     
