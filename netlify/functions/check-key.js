@@ -4,22 +4,26 @@ const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
 exports.handler = async function (event, context) {
   try {
-    const { key } = event.queryStringParameters;
+    // Get both the key AND the course from the URL
+    const { key, course } = event.queryStringParameters;
     const clientIp = event.headers['x-nf-client-connection-ip'];
 
-    if (!key) {
-      throw new Error('Key is missing');
+    if (!key || !course) {
+      throw new Error('Key or course is missing');
     }
 
-    // Find the record in Airtable that matches the key
+    // This is the new, more specific search formula.
+    // It looks for a record where the Key AND the Course match.
+    const filterByFormula = `AND({Key} = "${key}", {Course} = "${course}")`;
+
     const records = await base(AIRTABLE_TABLE_NAME)
       .select({
         maxRecords: 1,
-        filterByFormula: `{Key} = "${key}"`,
+        filterByFormula: filterByFormula,
       })
       .firstPage();
 
-    // If no record was found at all, the key is invalid.
+    // If no record was found, the key is invalid for this course.
     if (!records.length) {
       return { statusCode: 200, body: JSON.stringify({ isValid: false }) };
     }
@@ -28,32 +32,21 @@ exports.handler = async function (event, context) {
     const recordStatus = record.get('Status');
     const loggedIp = record.get('UsedByIP');
 
-    // CASE 1: The key is new and "Available".
     if (recordStatus === 'Available') {
-      // This is the first time this key is being used.
-      // Lock it to the current IP address and mark it as "Used".
       await base(AIRTABLE_TABLE_NAME).update(record.id, {
         "Status": "Used",
         "UsedByIP": clientIp,
         "DateUsed": new Date().toISOString()
       });
-      // Grant access for this first use.
       return { statusCode: 200, body: JSON.stringify({ isValid: true }) };
     }
 
-    // CASE 2: The key has been used before.
     if (recordStatus === 'Used') {
-      // This is a returning user. Check if their IP matches the one we saved.
-      if (clientIp === loggedIp) {
-        // The IPs match. Grant access.
+      if (clientIp && loggedIp && clientIp === loggedIp) {
         return { statusCode: 200, body: JSON.stringify({ isValid: true }) };
-      } else {
-        // The IPs DO NOT match. Deny access.
-        return { statusCode: 200, body: JSON.stringify({ isValid: false }) };
       }
     }
 
-    // Default case: If status is not "Available" or "Used", deny access.
     return { statusCode: 200, body: JSON.stringify({ isValid: false }) };
 
   } catch (error) {
