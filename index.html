@@ -15,7 +15,7 @@
         body {
             font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
             background-color: var(--background-color); padding: 40px 20px;
-            background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070');
+            background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto-format&fit=crop&q=80&w=2070');
             background-size: cover; background-position: center;
         }
         .login-card {
@@ -40,14 +40,13 @@
         <h1>Select Your Course</h1>
         <p>Please choose the course you wish to access.</p>
         <div class="course-selection">
-            <button class="cta-button" id="btn-course1" onclick="checkKey('The One Strategy')">Access The One Strategy</button>
-            <button class="cta-button" id="btn-course2" onclick="checkKey('Advanced Tactics')">Access Advanced Tactics</button>
-            <button class="cta-button" id="btn-course3" onclick="checkKey('Market Mastery')">Access Market Mastery</button>
+            <button class="cta-button" onclick="checkKey('The One and Only Strategy')">Access The One and Only Strategy</button>
+            <button class="cta-button" onclick="checkKey('Ultimate 5s')">Access Ultimate 5s</button>
+            <button class="cta-button" onclick="checkKey('Stake All In One')">Access Stake All In One</button>
         </div>
     </div>
 
     <script>
-        // The function now accepts a 'courseName' parameter
         async function checkKey(courseName) {
             document.querySelectorAll('.cta-button').forEach(btn => btn.disabled = true);
             
@@ -59,15 +58,12 @@
             }
 
             try {
-                // We now send both the key AND the courseName to our function
                 const response = await fetch(`/.netlify/functions/check-key?key=${userKey}&course=${encodeURIComponent(courseName)}`);
                 const data = await response.json();
 
                 if (data.isValid) {
                     alert('Success! Accessing the course now.');
-                    // IMPORTANT: You'll need separate HTML files for each course
-                    // For example: the-one-strategy.html, advanced-tactics.html
-                    // We will redirect based on the course name.
+                    // This generates the URL like "the-one-and-only-strategy.html"
                     let courseUrl = courseName.toLowerCase().replace(/\s+/g, '-') + '.html';
                     window.location.href = courseUrl;
                 } else {
