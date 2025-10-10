@@ -4,18 +4,18 @@ const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
 exports.handler = async function (event, context) {
   try {
-    // Get both the key AND the course from the URL
     const { key, course } = event.queryStringParameters;
     const clientIp = event.headers['x-nf-client-connection-ip'];
+    
+    // LOGGING LINE 1
+    console.log(`Function invoked. Key: "${key}", Course: "${course}"`);
 
     if (!key || !course) {
       throw new Error('Key or course is missing');
     }
 
-    // This is the new, more specific search formula.
-    // It looks for a record where the Key AND the Course match.
     const filterByFormula = `AND({Key} = "${key}", {Course} = "${course}")`;
-
+    
     const records = await base(AIRTABLE_TABLE_NAME)
       .select({
         maxRecords: 1,
@@ -23,7 +23,9 @@ exports.handler = async function (event, context) {
       })
       .firstPage();
 
-    // If no record was found, the key is invalid for this course.
+    // LOGGING LINE 2
+    console.log(`Airtable search complete. Found ${records.length} records.`);
+
     if (!records.length) {
       return { statusCode: 200, body: JSON.stringify({ isValid: false }) };
     }
@@ -50,7 +52,8 @@ exports.handler = async function (event, context) {
     return { statusCode: 200, body: JSON.stringify({ isValid: false }) };
 
   } catch (error) {
-    console.error("An error occurred:", error);
+    // LOGGING LINE 3
+    console.error("Function crashed with an error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),
