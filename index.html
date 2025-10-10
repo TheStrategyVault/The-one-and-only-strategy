@@ -9,75 +9,74 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #0052cc;
-            --primary-hover: #0041a3;
-            --background-color: #f7f9fc;
-            --card-background: #ffffff;
-            --text-color: #333333;
-            --subtle-text: #555555;
+            --primary-color: #0052cc; --primary-hover: #0041a3; --background-color: #f7f9fc;
+            --card-background: #ffffff; --text-color: #333333; --subtle-text: #555555;
         }
         body {
-            font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background-color: var(--background-color);
-            background-image: url('https://images.pexels.com/photos/1871508/pexels-photo-1871508.jpeg');
+            font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-color: var(--background-color); padding: 40px 20px;
+            background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070');
             background-size: cover; background-position: center;
         }
         .login-card {
-            background-color: var(--card-background); padding: 50px 40px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; width: 90%;
-            max-width: 400px; border: 1px solid #e1e4e8;
+            background-color: var(--card-background); padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; width: 100%;
+            max-width: 500px; border: 1px solid #e1e4e8;
         }
         .login-card h1 { color: var(--text-color); font-size: 24px; font-weight: 700; margin-bottom: 10px; }
         .login-card p { color: var(--subtle-text); font-size: 16px; margin-bottom: 30px; }
+        .course-selection { display: flex; flex-direction: column; gap: 15px; }
         .cta-button {
-            display: inline-block; background-color: var(--primary-color); color: white; padding: 14px 30px;
+            display: block; width: 100%; background-color: var(--primary-color); color: white; padding: 14px 20px;
             font-size: 16px; font-weight: 500; text-decoration: none; border: none; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s ease-in-out;
+            cursor: pointer; transition: background-color 0.2s ease-in-out; box-sizing: border-box;
         }
-        .cta-button:hover { background-color: var(--primary-hover); }
+        .cta-button:hover:not(:disabled) { background-color: var(--primary-hover); }
         .cta-button:disabled { background-color: #888; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div class="login-card">
-        <h1>The Forbidden Algorithm: The Secret Casinos Don't Want You to Know</h1>
-        <p>Enter your unique access key to begin.</p>
-        <button class="cta-button" onclick="checkKey()">Unlock Your Path to Profitability</button>
+        <h1>Select Your Course</h1>
+        <p>Please choose the course you wish to access.</p>
+        <div class="course-selection">
+            <button class="cta-button" id="btn-course1" onclick="checkKey('The One Strategy')">Access The One Strategy</button>
+            <button class="cta-button" id="btn-course2" onclick="checkKey('Advanced Tactics')">Access Advanced Tactics</button>
+            <button class="cta-button" id="btn-course3" onclick="checkKey('Market Mastery')">Access Market Mastery</button>
+        </div>
     </div>
 
     <script>
-        async function checkKey() {
-            // Get the button and show a "loading" state
-            const button = document.querySelector('.cta-button');
-            button.textContent = 'Checking...';
-            button.disabled = true;
-
-            let userKey = prompt('Please enter your access key:');
+        // The function now accepts a 'courseName' parameter
+        async function checkKey(courseName) {
+            document.querySelectorAll('.cta-button').forEach(btn => btn.disabled = true);
+            
+            let userKey = prompt('Please enter your access key for "' + courseName + '":');
 
             if (!userKey) {
-                button.textContent = 'Unlock Your Path to Profitability';
-                button.disabled = false;
+                document.querySelectorAll('.cta-button').forEach(btn => btn.disabled = false);
                 return;
             }
 
             try {
-                // This special URL points to the function we built.
-                // It works automatically on Netlify.
-                const response = await fetch('/.netlify/functions/check-key?key=' + userKey);
+                // We now send both the key AND the courseName to our function
+                const response = await fetch(`/.netlify/functions/check-key?key=${userKey}&course=${encodeURIComponent(courseName)}`);
                 const data = await response.json();
 
                 if (data.isValid) {
-                    alert('Success! Accessing the playbook now.');
-                    window.location.href = 'course.html';
+                    alert('Success! Accessing the course now.');
+                    // IMPORTANT: You'll need separate HTML files for each course
+                    // For example: the-one-strategy.html, advanced-tactics.html
+                    // We will redirect based on the course name.
+                    let courseUrl = courseName.toLowerCase().replace(/\s+/g, '-') + '.html';
+                    window.location.href = courseUrl;
                 } else {
-                    alert('Access Denied. This key is invalid or has already been used.');
-                    button.textContent = 'Unlock Your Path to Profitability';
-                    button.disabled = false;
+                    alert('Access Denied. This key is invalid for this course or has already been used on another device.');
                 }
             } catch (error) {
                 alert('An error occurred. Please try again.');
-                button.textContent = 'Unlock Your Path to Profitability';
-                button.disabled = false;
+            } finally {
+                document.querySelectorAll('.cta-button').forEach(btn => btn.disabled = false);
             }
         }
     </script>
